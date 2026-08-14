@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Финнавигатор — AI-вертикаль для Финуслуг</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0A0B;--card:#161618;--surf:#1E1E21;
+  --red:#E8373A;--rl:rgba(232,55,58,.12);--rb:rgba(232,55,58,.25);
+  --blue:#4A9FFF;--green:#34C759;--amber:#FF9F0A;
+  --tp:#F5F5F7;--ts:#8E8E93;--tt:#48484A;--bdr:rgba(255,255,255,.08)
+}
+body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--tp);height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased}
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--red);transition:width .4s ease;z-index:99}
+#counter{position:fixed;top:18px;right:26px;font-size:12px;color:var(--tt);font-family:"Syne",sans-serif;z-index:99}
+#nav{position:fixed;bottom:24px;right:26px;display:flex;gap:8px;z-index:99}
+.nb{width:40px;height:40px;border-radius:50%;border:1px solid var(--bdr);background:var(--surf);color:var(--tp);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-family:"DM Sans",sans-serif}
+.nb:hover{background:var(--red);border-color:var(--red)}
+.nb:disabled{opacity:.3;pointer-events:none}
+#hint{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--tt);z-index:99}
+.slide{position:fixed;top:0;left:0;width:100vw;height:100vh;display:none;flex-direction:column;padding:56px 80px 76px;opacity:0;transition:opacity .3s ease}
+.slide.active{display:flex;opacity:1;animation:fadeUp .35s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.lbl{font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--red);margin-bottom:12px}
+.h1{font-family:"Syne",sans-serif;font-size:50px;font-weight:800;letter-spacing:-1.5px;line-height:1.05}
+.h2{font-family:"Syne",sans-serif;font-size:32px;font-weight:800;letter-spacing:-.7px;line-height:1.1}
+.h3{font-family:"Syne",sans-serif;font-size:20px;font-weight:700;letter-spacing:-.3px}
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:18px 20px}
+.card-r{background:var(--rl);border:1px solid var(--rb);border-radius:14px;padding:18px 20px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
+.tr{background:var(--rl);color:var(--red);border:1px solid var(--rb)}
+.tg{background:rgba(52,199,89,.12);color:var(--green);border:1px solid rgba(52,199,89,.25)}
+.tb{background:rgba(74,159,255,.12);color:var(--blue);border:1px solid rgba(74,159,255,.25)}
+.ta{background:rgba(255,159,10,.12);color:var(--amber);border:1px solid rgba(255,159,10,.25)}
+.tq{background:rgba(255,255,255,.06);color:var(--ts);border:1px solid var(--bdr)}
+.bul{display:flex;flex-direction:column;gap:8px}
+.bi{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--ts);line-height:1.45}
+.bd{width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:5px}
+.div{width:100%;height:1px;background:var(--bdr);margin:14px 0}
+.bignum{font-family:"Syne",sans-serif;font-size:30px;font-weight:800;color:var(--red);letter-spacing:-1px}
+.sep{width:1px;background:var(--bdr);flex-shrink:0}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="counter">1 / 11</div>
+<div id="hint">← → или кнопки навигации</div>
+<div id="nav">
+  <button class="nb" id="pb" onclick="go(-1)">&#8592;</button>
+  <button class="nb" id="nb2" onclick="go(1)">&#8594;</button>
+</div>
+
+<!-- S1 TITLE -->
+<div class="slide active" id="s0" style="background:radial-gradient(ellipse at 70% 20%,rgba(232,55,58,.13) 0%,transparent 55%),var(--bg);justify-content:center">
+  <div class="lbl">КЕЙС · МОСКОВСКАЯ БИРЖА · ФИНУСЛУГ</div>
+  <div class="h1" style="margin-bottom:14px">Финна<span style="color:var(--red)">вигатор</span></div>
+  <div style="font-size:22px;color:var(--ts);margin-bottom:36px;max-width:540px;line-height:1.4">Новая AI-вертикаль для приложения Финуслуг</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:60px">
+    <span class="tag tr">AI-first сервис</span>
+    <span class="tag tq">Финансовый маркетплейс</span>
+    <span class="tag tq">MVP за 3–6 месяцев</span>
+    <span class="tag tq">Новый поток выручки</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:14px">
+    <div style="width:42px;height:42px;background:var(--red);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <span style="font-family:Syne,sans-serif;font-size:20px;font-weight:800;color:#fff">Ф</span>
+    </div>
+    <div>
+      <div style="font-size:13px;font-weight:600;color:var(--tp)">Группа платформы искусственного интеллекта</div>
+      <div style="font-size:12px;color:var(--ts)">Офис развития ИИ · Московская Биржа</div>
+    </div>
+  </div>
+</div>
+
+<!-- S2 CONTEXT -->
+<div class="slide" id="s1">
+  <div class="lbl">Бизнес-контекст</div>
+  <div class="h2" style="margin-bottom:20px">Финуслуг сегодня</div>
+  <div class="g3" style="margin-bottom:20px">
+    <div class="card">
+      <div style="font-size:26px;margin-bottom:10px">🏦</div>
+      <div style="font-size:14px;font-weight:600;color:var(--tp);margin-bottom:6px">Маркетплейс</div>
+      <div style="font-size:12px;color:var(--ts);line-height:1.5">Агрегирует банки, страховые, УК и брокеров — в одном приложении для розничных клиентов</div>
+    </div>
+    <div class="card">
+      <div style="font-size:26px;margin-bottom:10px">📦</div>
+      <div style="font-size:14px;font-weight:600;color:var(--tp);margin-bottom:6px">Продукты</div>
+      <div style="font-size:12px;color:var(--ts);line-height:1.5">Вклады, облигации, ИИС, страховки, кредиты, ПДС, фонды, брокерский счёт</div>
+    </div>
+    <div class="card">
+      <div style="font-size:26px;margin-bottom:10px">🛠</div>
+      <div style="font-size:14px;font-weight:600;color:var(--tp);margin-bottom:6px">Инструменты</div>
+      <div style="font-size:12px;color:var(--ts);line-height:1.5">Финздоровье, финцели, риск-профиль, обучение, калькуляторы, финподушка</div>
+    </div>
+  </div>
+  <div class="div"></div>
+  <div style="display:flex;gap:32px;align-items:flex-start">
+    <div style="flex:1">
+      <div style="font-size:11px;color:var(--tt);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:12px">Текущая ситуация</div>
+      <div class="bul">
+        <div class="bi"><div class="bd"></div><span>Витрина агрегирует продукты, но не ведёт пользователя</span></div>
+        <div class="bi"><div class="bd"></div><span>Пользователь должен сам знать что ему нужно</span></div>
+        <div class="bi"><div class="bd"></div><span>Нет регулярного AI-сценария — только разовые инструменты</span></div>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div style="flex:1">
+      <div style="font-size:11px;color:var(--red);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:12px">Вызов кейса</div>
+      <div class="card-r">
+        <div style="font-size:15px;color:var(--tp);line-height:1.6">Перейти от <strong>витрины продуктов</strong> к <strong>AI-сервису</strong>, который берёт на себя новую клиентскую работу и создаёт самостоятельный поток выручки</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S3 PROBLEM -->
+<div class="slide" id="s2">
+  <div class="lbl">Проблематика · JTBD</div>
+  <div class="h2" style="margin-bottom:6px">Пользователи приходят с ситуацией</div>
+  <div style="font-size:16px;color:var(--ts);margin-bottom:20px">Приложение отвечает витриной — это разрыв, который мы закрываем</div>
+  <div class="g2" style="margin-bottom:16px">
+    <div class="card">
+      <span class="tag tr" style="margin-bottom:10px">Тревожный накопитель</span>
+      <div style="font-size:13px;color:var(--ts);line-height:1.5;margin-bottom:8px">Не понимает куда уходят деньги и хватит ли их. Открывает приложение — не знает с чего начать.</div>
+      <div style="font-size:12px;color:var(--tt);font-style:italic">«Всё ли у меня нормально с финансами?»</div>
+    </div>
+    <div class="card">
+      <span class="tag ta" style="margin-bottom:10px">Человек на перепутье</span>
+      <div style="font-size:13px;color:var(--ts);line-height:1.5;margin-bottom:8px">Случилось событие — ребёнок, машина, увольнение. Знает что надо «что-то сделать», но не знает что.</div>
+      <div style="font-size:12px;color:var(--tt);font-style:italic">«Жду ребёнка — что делать финансово?»</div>
+    </div>
+    <div class="card">
+      <span class="tag tb" style="margin-bottom:10px">Пассивный держатель</span>
+      <div style="font-size:13px;color:var(--ts);line-height:1.5;margin-bottom:8px">Открыл продукты давно. От знакомых узнаёт что условия уже невыгодные. Предупреждений не было.</div>
+      <div style="font-size:12px;color:var(--tt);font-style:italic">«Мои продукты работают на меня?»</div>
+    </div>
+    <div class="card">
+      <span class="tag tg" style="margin-bottom:10px">Растерянный инвестор</span>
+      <div style="font-size:13px;color:var(--ts);line-height:1.5;margin-bottom:8px">Появились свободные деньги. Боится ошибиться с выбором инструмента. Откладывает решение.</div>
+      <div style="font-size:12px;color:var(--tt);font-style:italic">«Куда вложить 200 тысяч рублей?»</div>
+    </div>
+  </div>
+  <div style="background:var(--rl);border:1px solid var(--rb);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px">
+    <div style="width:4px;height:36px;background:var(--red);border-radius:2px;flex-shrink:0"></div>
+    <div style="font-size:15px;color:var(--tp);line-height:1.5">Все четыре сегмента приходят с <strong>жизненной задачей</strong>, а не с запросом на продукт. Сегодня на это никто не отвечает — ни витрина, ни калькуляторы, ни Финздоровье.</div>
+  </div>
+</div>
+
+<!-- S4 ANALOGUES -->
+<div class="slide" id="s3">
+  <div class="lbl">Анализ аналогов</div>
+  <div class="h2" style="margin-bottom:20px">6 продуктов — один вывод</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px">
+    <div class="card" style="padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div style="font-size:14px;font-weight:600;color:var(--tp)">Cleo</div>
+        <span class="tag tq" style="font-size:10px">США</span>
+      </div>
+      <div style="font-size:12px;color:var(--green);margin-bottom:4px;line-height:1.35">+ Разговорный тон, вовлечённость ×20</div>
+      <div style="font-size:12px;color:var(--ts);line-height:1.35">− Не ведёт к конкретному продукту</div>
+    </div>
+    <div class="card" style="padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div style="font-size:14px;font-weight:600;color:var(--tp)">Origin AI</div>
+        <span class="tag tq" style="font-size:10px">США</span>
+      </div>
+      <div style="font-size:12px;color:var(--green);margin-bottom:4px;line-height:1.35">+ Первый SEC-одобренный AI-советник</div>
+      <div style="font-size:12px;color:var(--ts);line-height:1.35">− Только США, сложный онбординг</div>
+    </div>
+    <div class="card" style="padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div style="font-size:14px;font-weight:600;color:var(--tp)">Copilot Money</div>
+        <span class="tag tq" style="font-size:10px">США</span>
+      </div>
+      <div style="font-size:12px;color:var(--green);margin-bottom:4px;line-height:1.35">+ Фоновый AI, лучший дизайн в категории</div>
+      <div style="font-size:12px;color:var(--ts);line-height:1.35">− Нет диалога, только показывает данные</div>
+    </div>
+    <div class="card" style="padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div style="font-size:14px;font-weight:600;color:var(--tp)">Monarch Money</div>
+        <span class="tag tq" style="font-size:10px">США</span>
+      </div>
+      <div style="font-size:12px;color:var(--green);margin-bottom:4px;line-height:1.35">+ Еженедельный AI-дайджест, семейный</div>
+      <div style="font-size:12px;color:var(--ts);line-height:1.35">− Нет выхода в конкретное действие</div>
+    </div>
+    <div class="card" style="padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div style="font-size:14px;font-weight:600;color:var(--tp)">Т-Банк</div>
+        <span class="tag tr" style="font-size:10px">RU</span>
+      </div>
+      <div style="font-size:12px;color:var(--green);margin-bottom:4px;line-height:1.35">+ Российский контекст, 6 ассистентов</div>
+      <div style="font-size:12px;color:var(--ts);line-height:1.35">− Ассистенты разрозненные, не связаны</div>
+    </div>
+    <div class="card" style="padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div style="font-size:14px;font-weight:600;color:var(--tp)">Яндекс Go</div>
+        <span class="tag tr" style="font-size:10px">RU</span>
+      </div>
+      <div style="font-size:12px;color:var(--green);margin-bottom:4px;line-height:1.35">+ AI за кулисами, нулевое трение</div>
+      <div style="font-size:12px;color:var(--ts);line-height:1.35">− Не финансовый продукт (UX-паттерн)</div>
+    </div>
+  </div>
+  <div style="background:var(--rl);border:1px solid var(--rb);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px">
+    <div style="width:4px;height:36px;background:var(--red);border-radius:2px;flex-shrink:0"></div>
+    <div style="font-size:15px;color:var(--tp);line-height:1.5">Ни один аналог не делает главного: <strong>не связывает жизненную ситуацию пользователя с продуктами платформы в одном сценарии.</strong> Финнавигатор закрывает именно этот разрыв.</div>
+  </div>
+</div>
+
+<!-- S5 FUNNEL -->
+<div class="slide" id="s4">
+  <div class="lbl">Воронка идей</div>
+  <div class="h2" style="margin-bottom:20px">5 концепций → 1 победитель</div>
+  <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--rl);border:2px solid var(--rb);border-radius:12px">
+      <div style="min-width:180px"><div style="font-size:13px;font-weight:600;color:var(--tp)">Финнавигатор</div><div style="font-size:11px;color:var(--ts)">AI-гид по жизненным событиям</div></div>
+      <div style="flex:1;height:20px;background:var(--surf);border-radius:4px;overflow:hidden"><div style="width:90%;height:100%;background:var(--red);border-radius:4px"></div></div>
+      <div style="min-width:42px;text-align:right;font-family:Syne,sans-serif;font-size:15px;font-weight:700;color:var(--red)">4.5</div>
+      <span class="tag tr">★ выбор</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--card);border:1px solid var(--bdr);border-radius:12px">
+      <div style="min-width:180px"><div style="font-size:13px;font-weight:600;color:var(--tp)">AI-монитор продуктов</div><div style="font-size:11px;color:var(--ts)">Проактивный агент следит за ставками</div></div>
+      <div style="flex:1;height:20px;background:var(--surf);border-radius:4px;overflow:hidden"><div style="width:73%;height:100%;background:rgba(255,255,255,.18);border-radius:4px"></div></div>
+      <div style="min-width:42px;text-align:right;font-family:Syne,sans-serif;font-size:14px;font-weight:600;color:var(--ts)">3.65</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--card);border:1px solid var(--bdr);border-radius:12px">
+      <div style="min-width:180px"><div style="font-size:13px;font-weight:600;color:var(--tp)">Финдневник</div><div style="font-size:11px;color:var(--ts)">Разговорный дневник трат</div></div>
+      <div style="flex:1;height:20px;background:var(--surf);border-radius:4px;overflow:hidden"><div style="width:72%;height:100%;background:rgba(255,255,255,.18);border-radius:4px"></div></div>
+      <div style="min-width:42px;text-align:right;font-family:Syne,sans-serif;font-size:14px;font-weight:600;color:var(--ts)">3.6</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--card);border:1px solid var(--bdr);border-radius:12px">
+      <div style="min-width:180px"><div style="font-size:13px;font-weight:600;color:var(--tp)">AI-ментор</div><div style="font-size:11px;color:var(--ts)">Тренажёр финансовой грамотности</div></div>
+      <div style="flex:1;height:20px;background:var(--surf);border-radius:4px;overflow:hidden"><div style="width:66%;height:100%;background:rgba(255,255,255,.18);border-radius:4px"></div></div>
+      <div style="min-width:42px;text-align:right;font-family:Syne,sans-serif;font-size:14px;font-weight:600;color:var(--ts)">3.3</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--card);border:1px solid var(--bdr);border-radius:12px">
+      <div style="min-width:180px"><div style="font-size:13px;font-weight:600;color:var(--tp)">Долгосрочный финплан</div><div style="font-size:11px;color:var(--ts)">AI строит многолетний план под цели</div></div>
+      <div style="flex:1;height:20px;background:var(--surf);border-radius:4px;overflow:hidden"><div style="width:52%;height:100%;background:rgba(255,255,255,.18);border-radius:4px"></div></div>
+      <div style="min-width:42px;text-align:right;font-family:Syne,sans-serif;font-size:14px;font-weight:600;color:var(--ts)">2.6</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center">
+    <span style="font-size:11px;color:var(--tt)">Критерии:</span>
+    <span class="tag tq" style="font-size:10px">Регулярность 25%</span>
+    <span class="tag tq" style="font-size:10px">Новизна 20%</span>
+    <span class="tag tq" style="font-size:10px">Монетизация 20%</span>
+    <span class="tag tq" style="font-size:10px">MVP 20%</span>
+    <span class="tag tq" style="font-size:10px">Регуляторный риск 15%</span>
+  </div>
+</div>
+
+<!-- S6 CONCEPT -->
+<div class="slide" id="s5" style="background:radial-gradient(ellipse at 80% 20%,rgba(232,55,58,.08) 0%,transparent 50%),var(--bg)">
+  <div class="lbl">Концепция</div>
+  <div class="h2" style="margin-bottom:4px">Финнавигатор</div>
+  <div style="font-size:18px;color:var(--ts);margin-bottom:24px">AI-гид по жизненным событиям</div>
+  <div style="display:flex;gap:14px;margin-bottom:20px;align-items:stretch;flex:1">
+    <div style="flex:1;display:flex;flex-direction:column;gap:10px">
+      <div class="card" style="flex:1">
+        <div style="font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:8px">01 · Вход</div>
+        <div style="font-size:14px;color:var(--tp);line-height:1.55">Пользователь пишет <span style="color:var(--red)">своими словами</span> что происходит в жизни — никаких меню и форм</div>
+      </div>
+      <div class="card" style="flex:1">
+        <div style="font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:8px">02 · Анализ</div>
+        <div style="font-size:14px;color:var(--tp);line-height:1.55">AI смотрит на <span style="color:var(--red)">профиль пользователя</span> — что уже открыто, финздоровье, цели, риск-профиль</div>
+      </div>
+      <div class="card" style="flex:1">
+        <div style="font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:8px">03 · Результат</div>
+        <div style="font-size:14px;color:var(--tp);line-height:1.55"><span style="color:var(--red)">Персональный чеклист</span> из продуктов платформы с объяснением и кнопкой «оформить»</div>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div style="flex:1;display:flex;flex-direction:column;gap:12px">
+      <div>
+        <div style="font-size:11px;color:var(--tt);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:10px">Почему не нарушает регуляцию</div>
+        <div class="bul">
+          <div class="bi"><div class="bd"></div><span>Не говорит «купи это» — объясняет варианты</span></div>
+          <div class="bi"><div class="bd"></div><span>«Обычно в такой ситуации рассматривают...»</span></div>
+          <div class="bi"><div class="bd"></div><span>Дисклеймер на входе, юрпроверка до релиза</span></div>
+        </div>
+      </div>
+      <div class="div"></div>
+      <div>
+        <div style="font-size:11px;color:var(--tt);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:10px">Уникальное преимущество</div>
+        <div class="card-r">
+          <div style="font-size:14px;color:var(--tp);line-height:1.55"><strong>Нейтральность платформы.</strong> Финуслуг агрегирует всех, а не продаёт один банк. Это структурное преимущество — Тинькофф его никогда не повторит.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S7 CJM -->
+<div class="slide" id="s6">
+  <div class="lbl">CJM · Customer Journey Map</div>
+  <div class="h2" style="margin-bottom:6px">Путь пользователя из 6 шагов</div>
+  <div style="font-size:14px;color:var(--ts);margin-bottom:20px">Сценарий: «Жду ребёнка — хочу разобраться с финансами»</div>
+  <div style="display:flex;gap:6px;align-items:stretch;flex:1;margin-bottom:16px">
+    <div style="flex:1;background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:14px 12px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px">
+        <div style="width:22px;height:22px;border-radius:50%;background:var(--rl);border:1px solid var(--rb);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:11px;font-weight:700;color:var(--red)">1</span></div>
+        <span style="font-size:12px;font-weight:700;color:var(--tp);font-family:Syne,sans-serif">Вход</span>
+      </div>
+      <div style="height:1px;background:var(--bdr)"></div>
+      <div><div style="font-size:9px;color:var(--tt);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">Пользователь</div><div style="font-size:11px;color:var(--ts);line-height:1.4">Пишет: «жду ребёнка»</div></div>
+      <div><div style="font-size:9px;color:var(--red);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">AI</div><div style="font-size:11px;color:var(--ts);line-height:1.4">Распознаёт событие и тип сценария</div></div>
+      <div style="margin-top:auto;padding:7px 9px;background:var(--surf);border-radius:8px"><div style="font-size:9px;color:var(--tt);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">Экран</div><div style="font-size:11px;color:var(--tp)">3 уточняющих вопроса</div></div>
+    </div>
+    <div style="color:var(--red);font-size:18px;align-self:center;flex-shrink:0">→</div>
+    <div style="flex:1;background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:14px 12px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px">
+        <div style="width:22px;height:22px;border-radius:50%;background:var(--rl);border:1px solid var(--rb);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:11px;font-weight:700;color:var(--red)">2</span></div>
+        <span style="font-size:12px;font-weight:700;color:var(--tp);font-family:Syne,sans-serif">Контекст</span>
+      </div>
+      <div style="height:1px;background:var(--bdr)"></div>
+      <div><div style="font-size:9px;color:var(--tt);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">Пользователь</div><div style="font-size:11px;color:var(--ts);line-height:1.4">Отвечает на вопросы</div></div>
+      <div><div style="font-size:9px;color:var(--red);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">AI</div><div style="font-size:11px;color:var(--ts);line-height:1.4">Анализирует профиль и продукты</div></div>
+      <div style="margin-top:auto;padding:7px 9px;background:var(--surf);border-radius:8px"><div style="font-size:9px;color:var(--tt);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">Экран</div><div style="font-size:11px;color:var(--tp)">«Собираю план...»</div></div>
+    </div>
+    <div style="color:var(--red);font-size:18px;align-self:center;flex-shrink:0">→</div>
+    <div style="flex:1;background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:14px 12px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px">
+        <div style="width:22px;height:22px;border-radius:50%;background:var(--rl);border:1px solid var(--rb);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:11px;font-weight:700;color:var(--red)">3</span></div>
+        <span style="font-size:12px;font-weight:700;color:var(--tp);font-family:Syne,sans-serif">Диагностика</span>
+      </div>
+      <div style="height:1px;background:var(--bdr)"></div>
+      <div><div style="font-size:9px;color:var(--tt);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">Пользователь</div><div style="font-size:11px;color:var(--ts);line-height:1.4">Читает анализ ситуации</div></div>
+      <div><div style="font-size:9px;color:var(--red);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">AI</div><div style="font-size:11px;color:var(--ts);line-height:1.4">Сверяет с чеклистом события</div></div>
+      <div style="margin-top:auto;padding:7px 9px;background:var(--surf);border-radius:8px"><div style="font-size:9px;color:var(--tt);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">Экран</div><div style="font-size:11px;color:var(--tp)">Карточки ✓ / ✕ / ⚠</div></div>
+    </div>
+    <div style="color:var(--red);font-size:18px;align-self:center;flex-shrink:0">→</div>
+    <div style="flex:1;background:var(--card);border:1px solid rgba(52,199,89,.25);border-radius:12px;padding:14px 12px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px">
+        <div style="width:22px;height:22px;border-radius:50%;background:rgba(52,199,89,.12);border:1px solid rgba(52,199,89,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:11px;font-weight:700;color:var(--green)">4</span></div>
+        <span style="font-size:12px;font-weight:700;color:var(--tp);font-family:Syne,sans-serif">План</span>
+      </div>
+      <div style="height:1px;background:var(--bdr)"></div>
+      <div><div style="font-size:9px;color:var(--tt);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">Пользователь</div><div style="font-size:11px;color:var(--ts);line-height:1.4">Изучает шаги плана</div></div>
+      <div><div style="font-size:9px;color:var(--red);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">AI</div><div style="font-size:11px;color:var(--ts);line-height:1.4">Приоритизирует продукты</div></div>
+      <div style="margin-top:auto;padding:7px 9px;background:var(--surf);border-radius:8px"><div style="font-size:9px;color:var(--tt);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">Экран</div><div style="font-size:11px;color:var(--tp)">Чеклист с кнопками</div></div>
+    </div>
+    <div style="color:var(--red);font-size:18px;align-self:center;flex-shrink:0">→</div>
+    <div style="flex:1;background:var(--card);border:1px solid rgba(52,199,89,.25);border-radius:12px;padding:14px 12px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px">
+        <div style="width:22px;height:22px;border-radius:50%;background:rgba(52,199,89,.12);border:1px solid rgba(52,199,89,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:11px;font-weight:700;color:var(--green)">5</span></div>
+        <span style="font-size:12px;font-weight:700;color:var(--tp);font-family:Syne,sans-serif">Действие</span>
+      </div>
+      <div style="height:1px;background:var(--bdr)"></div>
+      <div><div style="font-size:9px;color:var(--tt);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">Пользователь</div><div style="font-size:11px;color:var(--ts);line-height:1.4">Оформляет продукт</div></div>
+      <div><div style="font-size:9px;color:var(--red);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">AI</div><div style="font-size:11px;color:var(--ts);line-height:1.4">Открывает раздел витрины</div></div>
+      <div style="margin-top:auto;padding:7px 9px;background:var(--surf);border-radius:8px"><div style="font-size:9px;color:var(--tt);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">Экран</div><div style="font-size:11px;color:var(--tp)">Стандартный флоу</div></div>
+    </div>
+    <div style="color:var(--red);font-size:18px;align-self:center;flex-shrink:0">→</div>
+    <div style="flex:1;background:var(--card);border:1px solid rgba(52,199,89,.25);border-radius:12px;padding:14px 12px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px">
+        <div style="width:22px;height:22px;border-radius:50%;background:rgba(52,199,89,.12);border:1px solid rgba(52,199,89,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:11px;font-weight:700;color:var(--green)">6</span></div>
+        <span style="font-size:12px;font-weight:700;color:var(--tp);font-family:Syne,sans-serif">Мониторинг</span>
+      </div>
+      <div style="height:1px;background:var(--bdr)"></div>
+      <div><div style="font-size:9px;color:var(--tt);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">Пользователь</div><div style="font-size:11px;color:var(--ts);line-height:1.4">Получает пуш-напоминание</div></div>
+      <div><div style="font-size:9px;color:var(--red);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">AI</div><div style="font-size:11px;color:var(--ts);line-height:1.4">Проверяет прогресс плана</div></div>
+      <div style="margin-top:auto;padding:7px 9px;background:var(--surf);border-radius:8px"><div style="font-size:9px;color:var(--tt);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">Экран</div><div style="font-size:11px;color:var(--tp)">«2 из 3 шагов ✓»</div></div>
+    </div>
+  </div>
+  <div style="padding:10px 16px;background:var(--rl);border:1px solid var(--rb);border-radius:10px;font-size:13px;color:var(--tp)">
+    <strong>5 MVP-сценариев:</strong> жизненное событие · свободные деньги · тревога про финансы · проверка продуктов · непонятный термин
+  </div>
+</div>
+
+<!-- S8 MVP -->
+<div class="slide" id="s7">
+  <div class="lbl">MVP · Roadmap</div>
+  <div class="h2" style="margin-bottom:20px">Запуск за 3–6 месяцев</div>
+  <div style="display:flex;gap:20px;margin-bottom:20px">
+    <div style="flex:1">
+      <div style="font-size:11px;color:var(--tt);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:12px">Что входит в MVP</div>
+      <div class="bul">
+        <div class="bi"><div class="bd"></div><span>Чат со свободным вводом на естественном языке</span></div>
+        <div class="bi"><div class="bd"></div><span>5 базовых сценариев (события, деньги, тревога)</span></div>
+        <div class="bi"><div class="bd"></div><span>Диагностика на основе профиля пользователя</span></div>
+        <div class="bi"><div class="bd"></div><span>Чеклист с переходом в витрину</span></div>
+        <div class="bi"><div class="bd"></div><span>Пуш-напоминание через 30 дней</span></div>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div style="flex:1">
+      <div style="font-size:11px;color:var(--tt);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:12px">Использует из приложения</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+        <div style="padding:8px 12px;background:var(--card);border:1px solid var(--bdr);border-radius:10px;font-size:12px;color:var(--ts);display:flex;align-items:center;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0"></div>Финздоровье</div>
+        <div style="padding:8px 12px;background:var(--card);border:1px solid var(--bdr);border-radius:10px;font-size:12px;color:var(--ts);display:flex;align-items:center;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0"></div>Финансовые цели</div>
+        <div style="padding:8px 12px;background:var(--card);border:1px solid var(--bdr);border-radius:10px;font-size:12px;color:var(--ts);display:flex;align-items:center;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0"></div>Риск-профиль</div>
+        <div style="padding:8px 12px;background:var(--card);border:1px solid var(--bdr);border-radius:10px;font-size:12px;color:var(--ts);display:flex;align-items:center;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0"></div>Витрина</div>
+        <div style="padding:8px 12px;background:var(--card);border:1px solid var(--bdr);border-radius:10px;font-size:12px;color:var(--ts);display:flex;align-items:center;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0"></div>Уведомления</div>
+        <div style="padding:8px 12px;background:var(--card);border:1px solid var(--bdr);border-radius:10px;font-size:12px;color:var(--ts);display:flex;align-items:center;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0"></div>Профиль</div>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:11px;color:var(--tt);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:12px">Roadmap</div>
+  <div style="display:flex;gap:8px">
+    <div style="flex:1;padding:14px;background:var(--card);border:1px solid var(--bdr);border-radius:12px">
+      <div style="font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:600">Мес 1–2</div>
+      <div style="font-size:13px;font-weight:600;color:var(--tp);margin-bottom:6px">Разработка</div>
+      <div style="font-size:11px;color:var(--ts);line-height:1.4">AI-слой, 5 сценариев, дизайн, интеграция с профилем</div>
+    </div>
+    <div style="flex:1;padding:14px;background:var(--card);border:1px solid var(--bdr);border-radius:12px">
+      <div style="font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:600">Мес 3</div>
+      <div style="font-size:13px;font-weight:600;color:var(--tp);margin-bottom:6px">Закрытая бета</div>
+      <div style="font-size:11px;color:var(--ts);line-height:1.4">1000 пользователей, порог качества ≥80%</div>
+    </div>
+    <div style="flex:1;padding:14px;background:var(--rl);border:1px solid var(--rb);border-radius:12px">
+      <div style="font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:600">Мес 4–5</div>
+      <div style="font-size:13px;font-weight:600;color:var(--tp);margin-bottom:6px">Публичный запуск</div>
+      <div style="font-size:11px;color:var(--ts);line-height:1.4">Пуши, расширение до 10 сценариев</div>
+    </div>
+    <div style="flex:1;padding:14px;background:var(--card);border:1px solid var(--bdr);border-radius:12px">
+      <div style="font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:600">Мес 6</div>
+      <div style="font-size:13px;font-weight:600;color:var(--tp);margin-bottom:6px">Масштаб</div>
+      <div style="font-size:11px;color:var(--ts);line-height:1.4">Память, дайджест, B2B аналитика</div>
+    </div>
+  </div>
+</div>
+
+<!-- S9 MONETIZATION -->
+<div class="slide" id="s8">
+  <div class="lbl">Монетизация · Метрики</div>
+  <div class="h2" style="margin-bottom:20px">Три источника выручки</div>
+  <div class="g3" style="margin-bottom:18px">
+    <div class="card" style="border-color:var(--rb)">
+      <div style="font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:10px">01 · Основной</div>
+      <div style="font-size:15px;font-weight:700;color:var(--tp);margin-bottom:8px">Комиссия с продуктов</div>
+      <div class="bignum" style="margin-bottom:8px">~10.4M ₽</div>
+      <div style="font-size:12px;color:var(--ts);line-height:1.5">в месяц в пике<br>130K сессий × 10% конверсия × 800 ₽</div>
+    </div>
+    <div class="card">
+      <div style="font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:10px">02 · Подписка</div>
+      <div style="font-size:15px;font-weight:700;color:var(--tp);margin-bottom:8px">Финуслуги+ Premium</div>
+      <div class="bignum" style="margin-bottom:8px">+99–149 ₽</div>
+      <div style="font-size:12px;color:var(--ts);line-height:1.5">к текущей подписке за память между сессиями, дайджест и приоритетные пуши</div>
+    </div>
+    <div class="card">
+      <div style="font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:10px">03 · Фаза 2</div>
+      <div style="font-size:15px;font-weight:700;color:var(--tp);margin-bottom:8px">B2B аналитика</div>
+      <div style="font-size:13px;color:var(--ts);line-height:1.55;margin-top:8px">Агрегированные данные о жизненных событиях для финансовых партнёров платформы</div>
+    </div>
+  </div>
+  <div class="div"></div>
+  <div style="display:flex;gap:20px">
+    <div style="flex:1">
+      <div style="font-size:11px;color:var(--tt);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:10px">North Star Metric</div>
+      <div class="card-r" style="padding:14px 16px">
+        <div style="font-size:14px;color:var(--tp);line-height:1.55;margin-bottom:6px"><strong>Число пользователей, выполнивших ≥1 шаг из AI-плана за 30 дней</strong></div>
+        <div style="font-size:12px;color:var(--ts)">Цель: <span style="color:var(--red);font-weight:600">15 000</span> пользователей к 6-му месяцу</div>
+      </div>
+    </div>
+    <div style="flex:1">
+      <div style="font-size:11px;color:var(--tt);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:10px">Продуктовые метрики</div>
+      <div class="bul">
+        <div class="bi"><div class="bd"></div><span><strong>Plan Completion Rate</strong> — 2+ шага из 3 · цель 35–45%</span></div>
+        <div class="bi"><div class="bd"></div><span><strong>D30 Retention</strong> — возврат через 30 дней · цель 25–30%</span></div>
+        <div class="bi"><div class="bd"></div><span><strong>Conversion Rate</strong> — сессия → продукт · цель 10–12%</span></div>
+        <div class="bi"><div class="bd"></div><span><strong>Revenue per Session</strong> · цель 80–100 ₽</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S10 RISKS -->
+<div class="slide" id="s9">
+  <div class="lbl">Риски при реализации</div>
+  <div class="h2" style="margin-bottom:20px">Два критических · четыре управляемых</div>
+  <div class="g2" style="margin-bottom:14px">
+    <div style="background:rgba(232,55,58,.1);border:1px solid var(--rb);border-radius:14px;padding:18px 20px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="tag tr">🔴 Критический</span><span style="font-size:13px;font-weight:600;color:var(--tp)">Регуляторный риск</span></div>
+      <div style="font-size:13px;color:var(--ts);line-height:1.5;margin-bottom:10px">AI может генерировать формулировки, воспринимаемые как инвестиционная рекомендация</div>
+      <div style="font-size:12px;color:var(--green)">✓ Системный промпт, юрпроверка, дисклеймер — решается до запуска</div>
+    </div>
+    <div style="background:rgba(232,55,58,.1);border:1px solid var(--rb);border-radius:14px;padding:18px 20px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="tag tr">🔴 Критический</span><span style="font-size:13px;font-weight:600;color:var(--tp)">Качество AI</span></div>
+      <div style="font-size:13px;color:var(--ts);line-height:1.5;margin-bottom:10px">Нерелевантный ответ = потеря доверия навсегда. Пользователь не возвращается.</div>
+      <div style="font-size:12px;color:var(--green)">✓ MVP на жёстких чеклистах, порог беты 80% позитивных оценок</div>
+    </div>
+    <div style="background:rgba(255,159,10,.08);border:1px solid rgba(255,159,10,.2);border-radius:14px;padding:18px 20px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="tag ta">🟡 Средний</span><span style="font-size:13px;font-weight:600;color:var(--tp)">Недоверие к AI</span></div>
+      <div style="font-size:13px;color:var(--ts);line-height:1.5;margin-bottom:10px">Аудитория консервативна в финансах. Барьер: «это бот — он не понимает мою ситуацию»</div>
+      <div style="font-size:12px;color:var(--green)">✓ Прозрачность источников, постепенное раскрытие, соцдоказательство</div>
+    </div>
+    <div style="background:rgba(255,159,10,.08);border:1px solid rgba(255,159,10,.2);border-radius:14px;padding:18px 20px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="tag ta">🟡 Средний</span><span style="font-size:13px;font-weight:600;color:var(--tp)">Низкая регулярность</span></div>
+      <div style="font-size:13px;color:var(--ts);line-height:1.5;margin-bottom:10px">Событийный сервис: между событиями пользователь не возвращается — D30 падает</div>
+      <div style="font-size:12px;color:var(--green)">✓ Проактивные пуши, дайджест, реакция на внешние триггеры (ставка ЦБ)</div>
+    </div>
+  </div>
+  <div style="padding:12px 16px;background:var(--card);border:1px solid var(--bdr);border-radius:12px;font-size:13px;color:var(--ts);line-height:1.5">
+    <strong style="color:var(--tp)">Вывод:</strong> Ни один риск не является блокером концепции — все типичны для AI-продуктов в регулируемых индустриях и имеют известные методы митигации
+  </div>
+</div>
+
+<!-- S11 CONCLUSION -->
+<div class="slide" id="s10" style="background:radial-gradient(ellipse at 30% 70%,rgba(232,55,58,.1) 0%,transparent 55%),var(--bg);justify-content:center">
+  <div class="lbl" style="margin-bottom:18px">Итог</div>
+  <div class="h1" style="font-size:44px;margin-bottom:28px">Финна<span style="color:var(--red)">вигатор</span><br><span style="font-size:20px;color:var(--ts);font-weight:400;letter-spacing:-.3px">закрывает разрыв между жизнью и витриной</span></div>
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px">
+    <div style="display:flex;align-items:center;gap:12px"><div style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0"></div><span style="font-size:15px;color:var(--tp);font-weight:500">Новый сценарий</span><span style="font-size:14px;color:var(--ts)">— жизненные события, а не витрина продуктов</span></div>
+    <div style="display:flex;align-items:center;gap:12px"><div style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0"></div><span style="font-size:15px;color:var(--tp);font-weight:500">Регуляторно безопасен</span><span style="font-size:14px;color:var(--ts)">— информирует, а не советует</span></div>
+    <div style="display:flex;align-items:center;gap:12px"><div style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0"></div><span style="font-size:15px;color:var(--tp);font-weight:500">MVP за 3 месяца</span><span style="font-size:14px;color:var(--ts)">— на существующей инфраструктуре</span></div>
+    <div style="display:flex;align-items:center;gap:12px"><div style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0"></div><span style="font-size:15px;color:var(--tp);font-weight:500">Нейтральность платформы</span><span style="font-size:14px;color:var(--ts)">— то, что банк не повторит</span></div>
+    <div style="display:flex;align-items:center;gap:12px"><div style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0"></div><span style="font-size:15px;color:var(--tp);font-weight:500">~10 млн ₽/мес</span><span style="font-size:14px;color:var(--ts)">— потенциал комиссионной выручки в пике</span></div>
+  </div>
+  <div style="padding:18px 22px;background:var(--rl);border:1px solid var(--rb);border-radius:14px;display:flex;align-items:center;gap:14px;max-width:560px">
+    <div style="width:42px;height:42px;background:var(--red);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <span style="font-family:Syne,sans-serif;font-size:20px;font-weight:800;color:#fff">Ф</span>
+    </div>
+    <div style="font-size:16px;color:var(--tp);line-height:1.55">Пользователь пришёл с тревогой — <span style="color:var(--red);font-weight:600">ушёл с планом</span></div>
+  </div>
+</div>
+
+<script>
+var N=11,cur=0;
+var slides=document.querySelectorAll('.slide');
+var prog=document.getElementById('progress');
+var cnt=document.getElementById('counter');
+var pb=document.getElementById('pb');
+var nb=document.getElementById('nb2');
+function show(n){
+  slides[cur].classList.remove('active');
+  cur=Math.max(0,Math.min(N-1,n));
+  slides[cur].classList.add('active');
+  prog.style.width=((cur+1)/N*100)+'%';
+  cnt.textContent=(cur+1)+' / '+N;
+  pb.disabled=cur===0;
+  nb.disabled=cur===N-1;
+}
+function go(d){show(cur+d);}
+document.addEventListener('keydown',function(e){
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' ')go(1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')go(-1);
+});
+show(0);
+</script>
+</body>
+</html>
